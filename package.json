@@ -1,0 +1,9 @@
+{
+  "name": "SE_backend",
+  "version": "0.1.0",
+  "description": "Software Engineering webpage backend project",
+  "main": "index.js",
+  "repository": "https://github.com/onting/SE_backend.git",
+  "author": "Kwangyeon Kim <hemool123@naver.com>",
+  "license": "MIT"
+}
