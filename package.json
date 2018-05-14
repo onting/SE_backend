@@ -1,9 +1,22 @@
 {
-  "name": "SE_backend",
-  "version": "0.1.0",
-  "description": "Software Engineering webpage backend project",
+  "name": "se_backend",
+  "version": "1.0.0",
+  "description": "Software Engineering backend project",
   "main": "index.js",
-  "repository": "https://github.com/onting/SE_backend.git",
-  "author": "Kwangyeon Kim <hemool123@naver.com>",
-  "license": "MIT"
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onting/SE_backend.git"
+  },
+  "author": "onting, soondl, cocoapi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/onting/SE_backend/issues"
+  },
+  "homepage": "https://github.com/onting/SE_backend#readme",
+  "dependencies": {
+    "mongodb": "^3.1.0-beta4"
+  }
 }
