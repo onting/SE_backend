@@ -12,7 +12,7 @@ var reviewsRouter = require('./routes/reviews');
 
 var app = express();
 
-const url = 'mongodb://localhost/SEbackend'
+const url = 'mongodb://localhost:27017/SEdatabase' 
 mongoose.connect(url);
 
 mongoose.connection.once('open', function(){

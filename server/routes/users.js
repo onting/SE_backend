@@ -4,26 +4,69 @@ var mongoose = require('mongoose');
 
 const User = require('../models/user');
 
-/* GET users listing. */
-router.get('/:name', function(req, res, next) {
+router.get('/', function(req, res, next) {
+  User.find()
+      .exec()
+      .then(docs =>{
+        console.log(docs);
+        res.status(200).json(docs);
+      })
+      .catch(err =>{
+        console.log(err);
+        res.status(500).json({
+          error: err
+        });
+      });
+});
 
+router.get('/:userid', function(req, res, next) {
+  const userid = req.params.userid;
+  User.find({"userid": userid})
+      .exec()
+      .then(docs =>{
+        console.log(docs);
+        res.status(200).json(docs);
+      })
+      .catch(err =>{
+        console.log(err);
+        res.status(500).json({
+          error: err
+        });
+      });
 });
 
 router.post('/', function(req, res, next) {
-  const user = {
+  const user = new User({
     _id: new mongoose.Types.ObjectId(),
+    userid: req.body.userid,
+    password: req.body.password,
+    email: req.body.email,
     name: req.body.name,
-  }
+    address: req.body.address
+  });
 
   user.save()
       .then(result => {
         console.log(result);
+        res.status(200).json(result);
       })
       .catch(err => console.log(err));
 });
 
-router.delete('/:name', function(req, res, next) {
-  res.send('respond with a resource');
+router.delete('/:userid', function(req, res, next) {
+  const userid = req.params.userid;
+  User.remove({"userid": userid})
+      .exec()
+      .then(result =>{
+        console.log(result);
+        res.status(200).json(result);
+      })
+      .catch(err =>{
+        console.log(err);
+        res.status(500).json({
+          error: err
+        });
+      });
 });
 
 router.patch('/:name', function(req, res, next) {
