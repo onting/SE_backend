@@ -15,4 +15,4 @@ const productSchema = mongoose.Schema({
     {collection: 'products'}
 );
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('Product', productSchema);
