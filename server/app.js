@@ -3,11 +3,16 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var mongoose = require('mongoose');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
+
+const url = 'mongodb+srv://soon:soon@sedb-9fc9h.mongodb.net/test?retryWrites=true'
+mongoose.connect(url);
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
