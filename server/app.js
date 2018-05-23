@@ -12,9 +12,14 @@ var reviewsRouter = require('./routes/reviews');
 
 var app = express();
 
-const url = 'mongodb+srv://soon:soon@sedb-9fc9h.mongodb.net/test?retryWrites=true'
+const url = 'mongodb://localhost/SEbackend'
 mongoose.connect(url);
 
+mongoose.connection.once('open', function(){
+  console.log('Mongo Connection has been made!!');
+}).on('error', function(error){
+  console.log('Connection error', error);
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
