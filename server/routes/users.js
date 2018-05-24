@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 
 const User = require('../models/user');
 
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res, next) { 
   User.find()
       .exec()
       .then(docs =>{
@@ -20,8 +20,8 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/:userid', function(req, res, next) {
-  const userid = req.params.userid;
-  User.find({"userid": userid})
+  const id = req.params.userid;
+  User.find({userid: id})
       .exec()
       .then(docs =>{
         console.log(docs);
@@ -54,8 +54,8 @@ router.post('/', function(req, res, next) {
 });
 
 router.delete('/:userid', function(req, res, next) {
-  const userid = req.params.userid;
-  User.remove({"userid": userid})
+  const id = req.params.userid;
+  User.remove({userid: id})
       .exec()
       .then(result =>{
         console.log(result);
@@ -69,8 +69,28 @@ router.delete('/:userid', function(req, res, next) {
       });
 });
 
-router.patch('/:name', function(req, res, next) {
-  res.send('respond with a resource');
+router.patch('/:userid', function(req, res, next) {
+  const id = req.params.userid;
+  const updateOps = {};
+
+  Object.keys(req.body).forEach(function(key, index){
+    updateOps[key] = req.body[key];
+  })
+
+  console.log(updateOps);
+
+  User.update({ userid: id }, { $set: req.body })
+        .exec()
+        .then(result =>{
+          console.log(result);
+          res.status(200).json(result);
+        })
+        .catch(err => {
+          console.log(err);
+          res.status(500).json({
+            error: err
+          });
+        });
 });
 
 module.exports = router;
