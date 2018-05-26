@@ -19,12 +19,13 @@ router.get('/', function(req, res, next) {
       });
 });
 
-router.get('/:userid', function(req, res, next) {
-  const id = req.params.userid;
-  User.find({userid: id})
+router.get('/:email', function(req, res, next) {
+  const id = req.params.email;
+  User.find({email: id})
       .exec()
       .then(docs =>{
         console.log(docs);
+        docs.password = undefined;
         res.status(200).json(docs);
       })
       .catch(err =>{
@@ -35,14 +36,42 @@ router.get('/:userid', function(req, res, next) {
       });
 });
 
+router.post('/login', function(req, res, next) { 
+  const id = req.body.email;
+  const passwd = req.body.password;
+
+  User.findOne({email: id})
+      .exec()
+      .then(docs =>{
+        if(docs!==null){
+          if(docs.password === passwd) {
+            docs.password = undefined; // password만 삭제
+            res.status(200).json(docs); // 일치하는 user가 있는 경우 200
+          }
+  
+          else if(docs.password !== passwd){ 
+            res.status(301).end(); // email은 존재 하나 password가 틀린 경우 301
+          }
+        }
+
+        else{
+          res.status(302).end(); // 해당 email이 없는 경우
+        }
+      })
+      .catch(err =>{
+        console.log(err);
+        res.status(500).end(); 
+      });
+});
+
 router.post('/', function(req, res, next) {
   const user = new User({
     _id: new mongoose.Types.ObjectId(),
-    userid: req.body.userid,
-    password: req.body.password,
     email: req.body.email,
-    name: req.body.name,
-    address: req.body.address
+    password: req.body.password,
+    nickname: req.body.nickname,
+    address : req.body.address,
+    phone: req.body.phone
   });
 
   user.save()
@@ -50,15 +79,15 @@ router.post('/', function(req, res, next) {
         console.log(result);
         res.status(200).json(result);
       })
-      .catch(err => {
+      .catch( err => {
         console.log(err);
-        res.status(500).end();
+        res.status(301).end(); // 중복 email인 경우 301
       });
 });
 
-router.delete('/:userid', function(req, res, next) {
-  const id = req.params.userid;
-  User.remove({userid: id})
+router.delete('/:email', function(req, res, next) {
+  const id = req.params.email;
+  User.remove({email: id})
       .exec()
       .then(result =>{
         console.log(result);
@@ -72,8 +101,8 @@ router.delete('/:userid', function(req, res, next) {
       });
 });
 
-router.patch('/:userid', function(req, res, next) {
-  const id = req.params.userid;
+router.patch('/:email', function(req, res, next) {
+  const id = req.params.email;
   const updateOps = {};
 
   Object.keys(req.body).forEach(function(key, index){
@@ -82,7 +111,7 @@ router.patch('/:userid', function(req, res, next) {
 
   console.log(updateOps);
 
-  User.update({ userid: id }, { $set: req.body })
+  User.update({ email: id }, { $set: req.body })
         .exec()
         .then(result =>{
           console.log(result);
