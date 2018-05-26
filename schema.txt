@@ -1,0 +1,47 @@
+users: {
+    _id: ObjectID
+    user_id: String
+    passwd: String
+    address: String
+    email: String
+    role: String
+    join_date: Date
+    total_pay: Number
+    histories: [
+    {
+        product_id: ObjectID
+        payment_method: String
+        amount: Number
+        address: String
+        purchase_date: Date
+        receive_date: Date
+    }]
+    inquries: [{
+        title: String
+        product_name: String 
+        date: Date
+        content: String
+        answer: String
+    }]
+    Cart: {
+        product_id: ObjectID,
+        payment_method: String,
+        amount: Number,
+        address: String
+    }
+}
+
+Products: {
+    _id: ObjectID,
+    title: String,
+    catalog: String,
+    price: Number,
+    stock: Number,
+    total_sell: Number,
+    provider: String,
+    reviews: [{
+        user_name: String 
+        content: String 
+        rate: Number
+    }]
+}
