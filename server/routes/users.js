@@ -62,10 +62,10 @@ router.post('/', function(req, res, next) {
   const user = new User({
     _id: new mongoose.Types.ObjectId(),
     email: req.body.email,
-    password: req.body.passord,
+    password: req.body.password,
     nickname: req.body.nickname,
     address : req.body.address,
-    phone: req.body.phone,
+    phone: req.body.phone
   });
 
   user.save()
