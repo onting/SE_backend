@@ -11,9 +11,10 @@ const productSchema = mongoose.Schema({
     total_sell: {type: Number, default: 0, min: 0},
     img: {type: Buffer},
     reviews: [{
-        user_name: {type: String, required: true, trim: true},
+        _id: mongoose.Schema.Types.ObjectId,
+        nickname: {type: String, required: true, trim: true},
         content: String,
-        rate: {type: Number, required: true}
+        rate: {type: Number, default: 5, min: 1}
     }]
 },
     {collection: 'products'}

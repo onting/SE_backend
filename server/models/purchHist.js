@@ -9,7 +9,8 @@ const purchHistSchema = mongoose.Schema({
     amount: {type: Number, default: 1, min: 1},
     address: String,
     purchase_date: Date,
-    receive_date: mongoose.Schema.Types.Mixed
+    receive_date: mongoose.Schema.Types.Mixed,
+    return: {type: Boolean, default: false}
 },
     {collection: 'purchHists'}
 );

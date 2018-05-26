@@ -3,6 +3,7 @@ var router = express.Router();
 var mongoose = require('mongoose');
 
 const User = require('../models/user');
+const Cart = require('../models/cart');
 
 router.get('/', function(req, res, next) { 
   User.find()
@@ -53,7 +54,6 @@ router.post('/login', function(req, res, next) {
             res.status(301).end(); // email은 존재 하나 password가 틀린 경우 301
           }
         }
-
         else{
           res.status(302).end(); // 해당 email이 없는 경우
         }
@@ -85,12 +85,12 @@ router.post('/', function(req, res, next) {
       });
 });
 
-router.delete('/:email', function(req, res, next) {
+router.delete('/:email', function(req, res, next) { //유저 탈퇴
   const id = req.params.email;
   User.remove({email: id})
       .exec()
       .then(result =>{
-        console.log(result);
+        Cart.remove({email: id}).exec();
         res.status(200).json(result);
       })
       .catch(err =>{
@@ -101,7 +101,7 @@ router.delete('/:email', function(req, res, next) {
       });
 });
 
-router.patch('/:email', function(req, res, next) {
+router.patch('/:email', function(req, res, next) { //유저 정보 갱신
   const id = req.params.email;
   const updateOps = {};
 

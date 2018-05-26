@@ -24,7 +24,7 @@ router.get('/', function(req, res, next) { //전체 데이터 가져오기
       });
 });
 
-router.post('/', function(req, res, next){ //도큐먼트 삽입
+router.post('/', function(req, res, next){ //상품 추가
   var product = new Product({
     _id: new mongoose.Types.ObjectId,
     name: req.body.name,
@@ -86,21 +86,10 @@ router.get('/:prodId', function(req, res, next) { //특정 아이템 가져오�
 
 router.delete('/:prodId', function(req, res, next) { //특정 아이템 지우기
   const id = req.params.prodId;
-  var purchHist;
 
   Product.findByIdAndRemove(id)
       .exec()
       .then(result =>{
-        purchHist = new PurchHist({
-          _id: new mongoose.Types.ObjectId(),
-          product_id: result.product_id,
-          payment_method: result.payment_method,
-          amount: result.amount,
-          address: result.address,
-          purchase_date: Date.now(),
-          receive_date: null
-        });
-        purchHist.save();
         res.status(200).json(result);
       })
       .catch(err =>{
@@ -113,7 +102,11 @@ router.delete('/:prodId', function(req, res, next) { //특정 아이템 지우�
 
 router.patch('/:prodId', function(req, res, next) { //특정 아이템 업데이트
   const id = req.params.prodId;
-  Product.findByIdAndUpdate(id, {$set: req.body})
+  Product.findByIdAndUpdate(id, {$set: {name: req.body.name,
+    catalog: req.body.catalog,
+    platform: req.body.platform,
+    provider: req.body.provider,
+    price: req.body.price}})
       .exec()
       .then(result =>{
         res.status(200).json(result);
@@ -125,5 +118,62 @@ router.patch('/:prodId', function(req, res, next) { //특정 아이템 업데이
         });
       })
 });
+
+router.post('/:prodId/review', function(req, res, next){ //리뷰 작성
+  const id = req.params.prodId;
+  Product.findByIdAndUpdate(id, {$push: {reviews: {
+    _id: new mongoose.Types.ObjectId,
+    nickname: req.body.nickname,
+    content: req.body.content,
+    rate: req.body.rate
+  }}})
+      .exec()
+      .then(result =>{
+        res.status(200).json(result);
+      })
+      .catch(err =>{
+        res.status(500).json({
+          error: err
+        });
+      });
+})
+
+router.delete('/:prodId/review/:revId', function(req, res, next){ //리뷰 삭제
+  const prodId = req.params.prodId;
+  const revId = req.params.revId;
+  Product.findByIdAndUpdate(prodId, {$pull: {review: {_id: revId}}})
+      .exec()
+      .then(result => {
+        res.status(200).json(result);
+      })
+      .catch(err => {
+        res.status(500).json({error: err});
+      })
+})
+
+router.patch('/:prodId/review/:revId', function(req, res, next){ //리뷰 수정
+  const prodId = req.params.prodId;
+  const revId = req.params.revId;
+  Product.findByIdAndUpdate(revId, {$set: {content: req.body.content, rate: req.body.rate}})
+      .exec()
+      .then(result => {
+        res.status(200).json(result);
+      })
+      .catch(err => {
+        res.status(500).json({error: err});
+      })
+})
+
+router.get('/:prodId/review/:revId', function(req, res, next){ //리뷰 얻어오기
+  const revId = req.params.revId;
+  Product.findById(revId)
+      .exec()
+      .then(result => {
+        res.status(200).json(result);
+      })
+      .catch(err => {
+        res.status(500).json({error: err});
+      })
+})
 
 module.exports = router;
