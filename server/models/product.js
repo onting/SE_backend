@@ -2,11 +2,19 @@ const mongoose = require('mongoose');
 
 const productSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    title: {type: String, required: true, trim: true},
+    name: {type: String, required: true, trim: true},
     catalog: {type: String, required: true, trim: true},
     platform: {type: String, required: true, trim: true},
-    price: {type: Number, required: true, trim: true},
-    quantity: {type: Number, default: 1, trim: true, min:0},
+    provider: {type: String, required: false},
+    price: {type: Number, required: true, min:0},
+    stock: {type: Number, default: 1, min:0},
+    total_sell: {type: Number, default: 0, min: 0},
+    img: {type: Buffer},
+    reviews: [{
+        user_name: {type: String, required: true, trim: true},
+        content: String,
+        rate: {type: Number, required: true}
+    }]
 },
     {collection: 'products'}
 );
