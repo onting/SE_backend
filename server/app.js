@@ -4,7 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose');
-
+var bodyParser = require('body-parser');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var productsRouter = require('./routes/products');
@@ -12,6 +12,15 @@ var reviewsRouter = require('./routes/reviews');
 var cartsRouter = require('.routes/carts');
 
 var app = express();
+
+var allowCORS = (req, res, next) => {
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+	res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+	(req.method === 'OPTIONS') ?
+		res.sendStatus(200) :
+		next();
+}
 
 const url = 'mongodb://localhost:27017/SEdatabase' 
 mongoose.connect(url);
@@ -26,9 +35,12 @@ mongoose.connection.once('open', function(){
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true}));
+app.use(allowCORS);
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
