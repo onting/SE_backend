@@ -50,7 +50,10 @@ router.post('/', function(req, res, next) {
         console.log(result);
         res.status(200).json(result);
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        console.log(err);
+        res.status(500).end();
+      });
 });
 
 router.delete('/:userid', function(req, res, next) {

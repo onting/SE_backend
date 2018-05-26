@@ -8,13 +8,7 @@ const userSchema = mongoose.Schema({
     email: {type: String, required: true},
     name: {type:String, required: true, trim: true},
     address : {type:String, required: true},
-    role: {type: String, default:'user'},
-    cart: {
-        product_id: {type:ObjectId, required: true},
-        payment_method: {type:String, required: true, trim: true},
-        amount: {type:Number, default:1},
-        address: {type: String}
-    }
+    role: {type: String, default:'user'}
 },
     {collection: 'users'}
 );

@@ -1,7 +1,11 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+var fs = require('fs');
+var path = require('path');
 
+const imgDir = '/img';
 const Product = require('../models/product');
 
 /* GET users listing. */
@@ -21,7 +25,24 @@ router.get('/', function(req, res, next) { //전체 데이터 가져오기
 });
 
 router.post('/', function(req, res, next){ //도큐먼트 삽입
-  res.end();
+  var product = new Product({
+    _id: new mongoose.Types.ObjectId,
+    name: req.body.name,
+    catalog: req.body.catalog,
+    platform: req.body.platform,
+    provider: req.body.provider,
+    price: req.body.price,
+    stock: req.body.stock,
+    reviews: []
+  });
+  product.save()
+      .then(result => {
+        res.status(200).json(result);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).end();
+      });
 });
 
 router.get('/:platform/:catalog', function(req, res, next) { //product 리스트
@@ -47,10 +68,10 @@ router.get('/:platform/:catalog/:listnum', function(req, res, next) { //product 
       });
 });
 
-router.get('/:name', function(req, res, next) { //특정 아이템 가져오기
-  const name = req.params.name;
+router.get('/:prodId', function(req, res, next) { //특정 아이템 가져오기
+  const id = req.params.prodId;
 
-  Product.find({name: name}, {})
+  Product.findById(id)
       .exec()
       .then(docs =>{
         res.status(200).json(docs);
@@ -63,12 +84,23 @@ router.get('/:name', function(req, res, next) { //특정 아이템 가져오기
       });
 });
 
-router.delete('/:name', function(req, res, next) { //특정 아이템 지우기
-  const name = req.params.name;
-  Product.remove({name: name})
+router.delete('/:prodId', function(req, res, next) { //특정 아이템 지우기
+  const id = req.params.prodId;
+  var purchHist;
+
+  Product.findByIdAndRemove(id)
       .exec()
       .then(result =>{
-        console.log(result);
+        purchHist = new PurchHist({
+          _id: new mongoose.Types.ObjectId(),
+          product_id: result.product_id,
+          payment_method: result.payment_method,
+          amount: result.amount,
+          address: result.address,
+          purchase_date: Date.now(),
+          receive_date: null
+        });
+        purchHist.save();
         res.status(200).json(result);
       })
       .catch(err =>{
@@ -79,12 +111,11 @@ router.delete('/:name', function(req, res, next) { //특정 아이템 지우기
       })
 });
 
-router.patch('/:name', function(req, res, next) { //특정 아이템 업데이트
-  const name = req.params.name;
-  Product.Update({name: name}, {$set: req.body})
+router.patch('/:prodId', function(req, res, next) { //특정 아이템 업데이트
+  const id = req.params.prodId;
+  Product.findByIdAndUpdate(id, {$set: req.body})
       .exec()
       .then(result =>{
-        console.log(result);
         res.status(200).json(result);
       })
       .catch(err => {
