@@ -61,11 +61,11 @@ router.post('/login', function(req, res, next) {
 router.post('/', function(req, res, next) {
   const user = new User({
     _id: new mongoose.Types.ObjectId(),
-    userid: req.body.userid,
-    password: req.body.password,
     email: req.body.email,
-    name: req.body.name,
-    address: req.body.address
+    password: req.body.passord,
+    nickname: req.body.nickname,
+    address : req.body.address,
+    phone: req.body.phone,
   });
 
   user.save()
