@@ -80,6 +80,7 @@ router.post('/', function(req, res, next) {
         res.status(200).json(result);
       })
       .catch( err => {
+        console.log(err);
         res.status(301).end(); // 중복 email인 경우 301
       });
 });
