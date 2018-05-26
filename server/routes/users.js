@@ -20,7 +20,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/:userid', function(req, res, next) {
-  const id = req.params.userid;
+  const id = req.params.email;
   User.find({userid: id})
       .exec()
       .then(docs =>{
@@ -35,22 +35,56 @@ router.get('/:userid', function(req, res, next) {
       });
 });
 
+router.post('/login', function(req, res, next) { 
+  const id = req.body.email;
+  const passwd = req.body.password;
+
+  User.find({'email': id})
+      .exec()
+      .then(docs =>{
+        console.log(docs.password);
+        console.log(passwd);
+        if(docs[0].password === passwd) {
+          res.status(200).json(docs);
+        }
+
+        else if(docs[0].password !== passwd){
+          res.status(301).end();
+        }
+      })
+      .catch(err =>{
+        console.log(err);
+        res.status(302).end();
+      });
+});
+
 router.post('/', function(req, res, next) {
   const user = new User({
     _id: new mongoose.Types.ObjectId(),
-    userid: req.body.userid,
     password: req.body.password,
     email: req.body.email,
     name: req.body.name,
     address: req.body.address
   });
 
-  user.save()
-      .then(result => {
+  User.findOne({userid: user.userid})
+      .exec()
+      .then(result => { // userid 중복
         console.log(result);
-        res.status(200).json(result);
+        if(result){
+          user.save()
+          .then(result => {
+            console.log(result);
+            res.status(200).json(result);
+          })
+          .catch(err => console.log(err));
+        }
+        else{
+          res.end();
+        }
       })
-      .catch(err => console.log(err));
+      .catch(); // userid 중복ㅇ
+
 });
 
 router.delete('/:userid', function(req, res, next) {
