@@ -3,19 +3,13 @@ var router = express.Router();
 var mongoose = require('mongoose');
 
 const PurchHist = require('../models/purchHist');
+const Product = require('..models/product');
 
-router.post('/', function(req, res, next) { //결제 완료(cart에서 옮김)
-    const purchHist = new PurchHist({
-        _id: new mongoose.Types.ObjectId(),
-        product_id: req.body.product_id,
-        payment_method: req.body.payment_method,
-        amount: req.body.amount,
-        address: req.body.address,
-        purchase_date: req.body.address,
-        receive_date: null
-    });
+router.patch('/:purchId/receive', function(req, res, next){ //상품 수령
+    const purchId = req.params.purchId;
 
-    cart.save()
+    PurchHist.findByIdAndUpdate(purchId, {$set: {receive_date: Date.now()}})
+        .exec()
         .then(result => {
           res.status(200).json(result);
         })
@@ -24,6 +18,25 @@ router.post('/', function(req, res, next) { //결제 완료(cart에서 옮김)
                 error: err
             })
         });
+})
+
+router.patch('/:purchId/return', function(req, res, next){ //상품 반품
+    const purchId = req.params.purchId;
+
+    PurchHist.findByIdAndUpdate(purchId, {$set: {return: true}})
+        .exec()
+        .then(result => {
+            Product.findByIdAndUpdate(result.product_id, {$set: 
+                {stock: this.stock+result.amount, 
+                total_sell: this.total_sell - this.price*result.amount}});
+            res.status(200).json(result);
+        })
+        .catch(err => {
+            res.status(500).json({
+                error: err
+            })
+        })
+
 });
 
 router.get('/:email', function(req, res, next){ //사용자 구매기록 조회
