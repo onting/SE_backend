@@ -10,7 +10,7 @@ const productSchema = mongoose.Schema({
     price: {type: Number, required: true, min:0},
     stock: {type: Number, default: 1, min:0},
     total_sell: {type: Number, default: 0, min: 0},
-    img: {type: Buffer},
+    img: {data: Buffer, contentType: String},
     reviews: [{
         _id: mongoose.Schema.Types.ObjectId,
         email: {type: String, required: true, trim: true},
