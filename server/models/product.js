@@ -11,6 +11,7 @@ const productSchema = mongoose.Schema({
     stock: {type: Number, default: 1, min:0},
     total_sell: {type: Number, default: 0, min: 0},
     img: {data: Buffer, contentType: String},
+    imgSub: {data: Buffer, contentType: String},
     reviews: [{
         _id: mongoose.Schema.Types.ObjectId,
         email: {type: String, required: true, trim: true},
