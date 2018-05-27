@@ -24,14 +24,15 @@ router.get('/', function(req, res, next) { //전체 데이터 가져오기
       });
 });
 
-router.post('/product', upload.single('img'), function(req, res, next){ //상품 추가
+router.post('/product', upload.single('imgs'), function(req, res, next){ //상품 추가
   var product = new Product({
     _id: new mongoose.Types.ObjectId,
     name: req.body.name,
     catalog: req.body.catalog,
     platform: req.body.platform,
     provider: req.body.provider,
-    img : {data: req.file.buffer, contentType: 'image/' + req.file.originalname.split('.').pop()},
+    img : {data: req.file[0].buffer, contentType: 'image/' + req.file[0].originalname.split('.').pop()},
+    imgSub: {data: req.file[1].buffer, contentType: 'image/' + req.file[1].originalname.split('.').pop()},
     price: req.body.price,
     stock: req.body.stock,
     reviews: []
@@ -46,13 +47,39 @@ router.post('/product', upload.single('img'), function(req, res, next){ //상품
       });
 });
 
-router.get('/image/:prodId', function(req, res, next){
+router.post('/product/:prodId', upload.single('imgs'), function(req, res, next){ //상품 추가
+  const prodId = res.params.prodId;
+  Product.findByIdAndUpdate(prodId, {$set: {
+    name: req.body.name,
+    catalog: req.body.name,
+    platform: req.body.platform,
+    provider: req.body.provider,
+    release_date: req.body.release_date,
+    price: req.body.price,
+    stock: req.body.stock,
+    total_sell: req.body.total_sell,
+    img: {data: req.file[0].buffer, contentType: 'image/' + req.file[0].originalname.split('.').pop()},
+    imgSub: {data: req.file[1].buffer, contentType: 'image/' + req.file[1].originalname.split('.').pop()}
+  }});
+});
+
+router.get('/image/:sel/:prodId', function(req, res, next){
   const id = req.params.prodId;
+  const sel = req.params.sel;
+  var img;
   Product.findById(id)
       .exec()
       .then(result =>{
-        res.writeHead(200, {'Content-type' : result.img.contentType});
-        res.end(result.img.data);
+        switch(sel) {
+          case 1:
+            img = result.img;
+            break;
+          case 2:
+            img = result.imgSub;
+            break;
+        }
+        res.writeHead(200, {'Content-type' : img.contentType});
+        res.end(img.data);
       })
       .catch(err =>{
         console.log(err);
@@ -78,14 +105,16 @@ router.get('/product/:prodId', function(req, res, next) { //특정 아이템 가
 });
 
 router.get('/list/:platform/:catalog', function(req, res, next) { //product 리스트
-  res.redirect('1');
+  const platform = req.params.platform;
+  const catalog = req.params.catalog;
+  res.redirect('/products/list/' + platform + '/' + catalog + '/' + '1');
 });
 
 router.get('/list/:platform/:catalog/:listnum', function(req, res, next) { //product 리스트
   const name = req.params.platform;
   const catalog = req.params.catalog;
   const num = req.params.listnum;
-  Product.find({platform: name, catalog: catalog})
+  Product.find({platform: name, catalog: catalog}, {img: false, imgSub: false})
       .skip((num-1) * 20)
       .limit(20)
       .exec()
