@@ -6,13 +6,14 @@ const productSchema = mongoose.Schema({
     catalog: {type: String, required: true, trim: true},
     platform: {type: String, required: true, trim: true},
     provider: {type: String, required: false},
+    release_date: {type: Date, default: Date.now()},
     price: {type: Number, required: true, min:0},
     stock: {type: Number, default: 1, min:0},
     total_sell: {type: Number, default: 0, min: 0},
     img: {type: Buffer},
     reviews: [{
         _id: mongoose.Schema.Types.ObjectId,
-        nickname: {type: String, required: true, trim: true},
+        email: {type: String, required: true, trim: true},
         content: String,
         rate: {type: Number, default: 5, min: 1}
     }]

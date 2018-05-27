@@ -5,6 +5,10 @@ var mongoose = require('mongoose');
 const PurchHist = require('../models/purchHist');
 const Product = require('../models/product');
 
+router.post('/', function(req, res, next){
+    const purchHist = new PurchHist();
+})
+
 router.patch('/:purchId/receive', function(req, res, next){ //상품 수령
     const purchId = req.params.purchId;
 
