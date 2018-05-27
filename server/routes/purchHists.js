@@ -3,7 +3,7 @@ var router = express.Router();
 var mongoose = require('mongoose');
 
 const PurchHist = require('../models/purchHist');
-const Product = require('..models/product');
+const Product = require('../models/product');
 
 router.patch('/:purchId/receive', function(req, res, next){ //상품 수령
     const purchId = req.params.purchId;
@@ -54,4 +54,4 @@ router.get('/:email', function(req, res, next){ //사용자 구매기록 조회
         });
 });
 
-router.patch
+module.exports = router;
