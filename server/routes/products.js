@@ -10,7 +10,7 @@ const Product = require('../models/product');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) { //전체 데이터 가져오기
-  Product.find()
+  Product.find({}, {img: false})
       .exec()
       .then(docs =>{
         console.log(docs);
@@ -31,14 +31,14 @@ router.post('/product', upload.single('img'), function(req, res, next){ //상품
     catalog: req.body.catalog,
     platform: req.body.platform,
     provider: req.body.provider,
-    img : req.file.buffer,
+    img : {data: req.file.buffer, contentType: 'image/' + req.file.originalname.split('.').pop()},
     price: req.body.price,
     stock: req.body.stock,
     reviews: []
   });
   product.save()
       .then(result => {
-        res.status(200).json(result);
+        res.status(200).json(result._id);
       })
       .catch(err => {
         console.log(err);
@@ -46,9 +46,25 @@ router.post('/product', upload.single('img'), function(req, res, next){ //상품
       });
 });
 
-router.get('/product/:prodId', function(req, res, next) { //특정 아이템 가져오기
+router.get('/image/:prodId', function(req, res, next){
   const id = req.params.prodId;
   Product.findById(id)
+      .exec()
+      .then(result =>{
+        res.writeHead(200, {'Content-type' : result.img.contentType});
+        res.end(result.img.data);
+      })
+      .catch(err =>{
+        console.log(err);
+        res.status(500).json({
+          error: err
+        });
+      });
+})
+
+router.get('/product/:prodId', function(req, res, next) { //특정 아이템 가져오기
+  const id = req.params.prodId;
+  Product.findById(id, {img: false})
       .exec()
       .then(result =>{
         res.status(200).json(result);
