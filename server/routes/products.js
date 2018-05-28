@@ -24,15 +24,18 @@ router.get('/', function(req, res, next) { //전체 데이터 가져오기
       });
 });
 
-router.post('/product', upload.single('imgs'), function(req, res, next){ //상품 추가
+router.post('/product', upload.fields([{name: 'img', maxCount: 1}, {name: 'imgSub', maxCount: 1}]), function(req, res, next){ //상품 추가
+  img = req.files['img'][0];
+  imgSub = req.files['imgSub'][0];
+  
   var product = new Product({
     _id: new mongoose.Types.ObjectId,
     name: req.body.name,
     catalog: req.body.catalog,
     platform: req.body.platform,
     provider: req.body.provider,
-    img : {data: req.file[0].buffer, contentType: 'image/' + req.file[0].originalname.split('.').pop()},
-    imgSub: {data: req.file[1].buffer, contentType: 'image/' + req.file[1].originalname.split('.').pop()},
+    img : {data: img.buffer, contentType: 'image/' + img.originalname.split('.').pop()},
+    imgSub: {data: imgSub.buffer, contentType: 'image/' + imgSub.originalname.split('.').pop()},
     price: req.body.price,
     stock: req.body.stock,
     reviews: []
@@ -47,8 +50,12 @@ router.post('/product', upload.single('imgs'), function(req, res, next){ //상�
       });
 });
 
-router.post('/product/:prodId', upload.single('imgs'), function(req, res, next){ //상품 추가
+router.patch('/product/:prodId', upload.fields([{name: 'img', maxCount: 1}, {name: 'imgSub', maxCount: 1}]), function(req, res, next){ //상품 추가
   const prodId = res.params.prodId;
+  
+  img = req.files['img'][0];
+  imgSub = req.files['imgSub'][0];
+
   Product.findByIdAndUpdate(prodId, {$set: {
     name: req.body.name,
     catalog: req.body.name,
@@ -58,9 +65,16 @@ router.post('/product/:prodId', upload.single('imgs'), function(req, res, next){
     price: req.body.price,
     stock: req.body.stock,
     total_sell: req.body.total_sell,
-    img: {data: req.file[0].buffer, contentType: 'image/' + req.file[0].originalname.split('.').pop()},
-    imgSub: {data: req.file[1].buffer, contentType: 'image/' + req.file[1].originalname.split('.').pop()}
-  }});
+    img: {data: img.buffer, contentType: 'image/' + img.originalname.split('.').pop()},
+    imgSub: {data: imgSub.buffer, contentType: 'image/' + imgSub.originalname.split('.').pop()}
+  }})
+      .exec()
+      .then(result =>{
+        res.status(200).json(result._id);
+      })
+      .catch(err => {
+        res.status(500).json({error: err});
+      })
 });
 
 router.get('/image/:sel/:prodId', function(req, res, next){
@@ -78,8 +92,13 @@ router.get('/image/:sel/:prodId', function(req, res, next){
             img = result.imgSub;
             break;
         }
-        res.writeHead(200, {'Content-type' : img.contentType});
-        res.end(img.data);
+        if(img){
+          res.writeHead(200, {'Content-type' : img.contentType});
+          res.end(img.data);
+        }
+        else{
+          res.end();
+        }
       })
       .catch(err =>{
         console.log(err);
@@ -114,7 +133,9 @@ router.get('/list/:platform/:catalog/:listnum', function(req, res, next) { //pro
   const name = req.params.platform;
   const catalog = req.params.catalog;
   const num = req.params.listnum;
-  Product.find({platform: name, catalog: catalog}, {img: false, imgSub: false})
+  
+  if(catalog == 'all') {
+    Product.find({platform: name}, {img: false, imgSub: false})
       .skip((num-1) * 20)
       .limit(20)
       .exec()
@@ -127,6 +148,22 @@ router.get('/list/:platform/:catalog/:listnum', function(req, res, next) { //pro
           error: err
         });
       });
+  }
+  else{
+    Product.find({platform: name, catalog: catalog}, {img: false, imgSub: false})
+      .skip((num-1) * 20)
+      .limit(20)
+      .exec()
+      .then(docs =>{
+        res.status(200).json(docs);
+      })
+      .catch(err =>{
+        console.log(err);
+        res.status(500).json({
+          error: err
+        });
+      });
+  }
 });
 
 router.get('/review', function(req, res, next){ //리뷰 얻어오기

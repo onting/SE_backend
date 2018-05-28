@@ -15,6 +15,8 @@ router.patch('/:purchId/receive', function(req, res, next){ //상품 수령
     PurchHist.findByIdAndUpdate(purchId, {$set: {receive_date: Date.now()}})
         .exec()
         .then(result => {
+            Product.findByIdAndUpdate(result.product_id, {$inc: 
+                {stock: -result.amount, total_sell: this.price*result.amount}});
           res.status(200).json(result);
         })
         .catch(err => {
@@ -30,9 +32,8 @@ router.patch('/:purchId/return', function(req, res, next){ //상품 반품
     PurchHist.findByIdAndUpdate(purchId, {$set: {return: true}})
         .exec()
         .then(result => {
-            Product.findByIdAndUpdate(result.product_id, {$set: 
-                {stock: this.stock+result.amount, 
-                total_sell: this.total_sell - this.price*result.amount}});
+            Product.findByIdAndUpdate(result.product_id, {$inc: 
+                {stock: result.amount, total_sell: -this.price*result.amount}});
             res.status(200).json(result);
         })
         .catch(err => {
