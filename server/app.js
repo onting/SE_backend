@@ -22,7 +22,7 @@ var allowCORS = (req, res, next) => {
 		next();
 }
 
-const url = 'mongodb://localhost:27017/SEdatabase' 
+const url = 'mongodb+srv://soon:tnsgud@sedb-9fc9h.mongodb.net/test' 
 mongoose.connect(url);
 
 mongoose.connection.once('open', function(){
