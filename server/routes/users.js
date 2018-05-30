@@ -22,11 +22,10 @@ router.get('/', function(req, res, next) {
 
 router.get('/:email', function(req, res, next) {
   const id = req.params.email;
-  User.find({email: id})
+  User.find({email: id}, {password: false})
       .exec()
       .then(docs =>{
         console.log(docs);
-        docs.password = undefined;
         res.status(200).json(docs);
       })
       .catch(err =>{

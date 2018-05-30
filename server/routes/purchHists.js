@@ -5,8 +5,26 @@ var mongoose = require('mongoose');
 const PurchHist = require('../models/purchHist');
 const Product = require('../models/product');
 
-router.post('/', function(req, res, next){
-    const purchHist = new PurchHist();
+router.post('/', function(req, res, next){ //주문 완료
+    const purchHist = new PurchHist({
+        _id: new mongoose.Types.ObjectId,
+        email: req.body.email,
+        product_id: req.body.product_id,
+        payment_method: req.body.payment_method,
+        amount: req.body.amount,
+        address: req.body.address,
+        purchase_date: req.body.address,
+        receive_date: null,
+    });
+    purchHist.save()
+        .exec()
+        .then(result => {
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({error: err})
+        })
 })
 
 router.patch('/:purchId/receive', function(req, res, next){ //상품 수령
