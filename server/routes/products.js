@@ -24,7 +24,8 @@ router.get('/', function(req, res, next) { //전체 데이터 가져오기
       });
 });
 
-router.post('/product', upload.fields([{name: 'img', maxCount: 1}, {name: 'imgSub', maxCount: 1}]), function(req, res, next){ //상품 추가
+router.post('/product', upload.fields([{name: 'img', maxCount: 1}, 
+          {name: 'imgSub', maxCount: 1}]), function(req, res, next){ //상품 추가
   img = req.files['img'][0];
   imgSub = req.files['imgSub'][0];
   
@@ -50,7 +51,8 @@ router.post('/product', upload.fields([{name: 'img', maxCount: 1}, {name: 'imgSu
       });
 });
 
-router.patch('/product/:prodId', upload.fields([{name: 'img', maxCount: 1}, {name: 'imgSub', maxCount: 1}]), function(req, res, next){ //상품 추가
+router.patch('/product/:prodId', upload.fields([{name: 'img', maxCount: 1}, 
+          {name: 'imgSub', maxCount: 1}]), function(req, res, next){ //상품 추가
   const prodId = res.params.prodId;
   
   img = req.files['img'][0];
@@ -166,10 +168,10 @@ router.get('/list/:platform/:catalog/:listnum', function(req, res, next) { //pro
   }
 });
 
-router.get('/review', function(req, res, next){ //리뷰 얻어오기
-  const revId = req.params.revId;
+router.get('/review/:prodId', function(req, res, next){ //리뷰 얻어오기
+  const prodId = req.params.prodId;
 
-  Product.findById(revId)
+  Product.findById(prodId)
       .exec()
       .then(result => {
         res.status(200).json(result);
@@ -183,6 +185,7 @@ router.post('/review/:prodId', function(req, res, next){ //리뷰 작성
   const prodId = req.params.prodId;
   Product.findByIdAndUpdate(prodIdd, {$push: {reviews: {
     _id: new mongoose.Types.ObjectId,
+    title: req.body.title,
     email: req.body.eail,
     content: req.body.content,
     rate: req.body.rate

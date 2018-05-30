@@ -14,6 +14,7 @@ const productSchema = mongoose.Schema({
     imgSub: {data: Buffer, contentType: String},
     reviews: [{
         _id: mongoose.Schema.Types.ObjectId,
+        title: {type: String, trim: true},                                                                                   
         email: {type: String, required: true, trim: true},
         content: String,
         rate: {type: Number, default: 5, min: 1}
