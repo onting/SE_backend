@@ -22,11 +22,10 @@ router.get('/', function(req, res, next) {
 
 router.get('/:email', function(req, res, next) {
   const id = req.params.email;
-  User.find({email: id}, {password: false})
+  User.findOne({email: id}, {password: false})
       .exec()
-      .then(docs =>{
-        console.log(docs);
-        res.status(200).json(docs);
+      .then(result =>{
+        res.status(200).json(result);
       })
       .catch(err =>{
         console.log(err);
@@ -42,14 +41,13 @@ router.post('/login', function(req, res, next) {
 
   User.findOne({email: id})
       .exec()
-      .then(docs =>{
-        if(docs!==null){
-          if(docs.password === passwd) {
-            docs.password = undefined; // password만 삭제
-            res.status(200).json(docs); // 일치하는 user가 있는 경우 200
+      .then(result =>{
+        if(result!==null){
+          if(result.password === passwd) {
+            result.password = undefined;
+            res.status(200).json(result); // 일치하는 user가 있는 경우 200
           }
-  
-          else if(docs.password !== passwd){ 
+          else if(result.password !== passwd){ 
             res.status(301).end(); // email은 존재 하나 password가 틀린 경우 301
           }
         }
@@ -69,7 +67,10 @@ router.post('/', function(req, res, next) {
     email: req.body.email,
     password: req.body.password,
     nickname: req.body.nickname,
+    post_code: req.body.post_code,
     address : req.body.address,
+    address_detail: req.body.address_detail,
+    role: req.body.role,
     phone: req.body.phone
   });
 

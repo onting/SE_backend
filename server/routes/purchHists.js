@@ -13,11 +13,10 @@ router.post('/', function(req, res, next){ //주문 완료
         payment_method: req.body.payment_method,
         amount: req.body.amount,
         address: req.body.address,
-        purchase_date: req.body.address,
-        receive_date: null,
+        address_detail: req.body.address_detail,
+        purchase_date: req.body.purchase_date
     });
     purchHist.save()
-        .exec()
         .then(result => {
             res.status(200).json(result)
         })
@@ -27,15 +26,22 @@ router.post('/', function(req, res, next){ //주문 완료
         })
 })
 
-router.patch('/:purchId/receive', function(req, res, next){ //상품 수령
+router.patch('/receive/:purchId', function(req, res, next){ //상품 수령
     const purchId = req.params.purchId;
 
     PurchHist.findByIdAndUpdate(purchId, {$set: {receive_date: Date.now()}})
         .exec()
         .then(result => {
-            Product.findByIdAndUpdate(result.product_id, {$inc: 
-                {stock: -result.amount, total_sell: this.price*result.amount}});
-          res.status(200).json(result);
+            Product.findByIdAndUpdate(result.product_id, {$inc: {stock: -result.amount, total_sell: result.amount}})
+                .exec()
+                .then(result => {
+                    res.status(200).json(result);
+                })
+                .catch(err => {
+                    res.status(500).json({
+                        error: err
+                    })
+                })
         })
         .catch(err => {
             res.status(500).json({
@@ -44,14 +50,14 @@ router.patch('/:purchId/receive', function(req, res, next){ //상품 수령
         });
 })
 
-router.patch('/:purchId/return', function(req, res, next){ //상품 반품
+router.patch('/return/:purchId', function(req, res, next){ //상품 반품
     const purchId = req.params.purchId;
 
     PurchHist.findByIdAndUpdate(purchId, {$set: {return: true}})
         .exec()
         .then(result => {
             Product.findByIdAndUpdate(result.product_id, {$inc: 
-                {stock: result.amount, total_sell: -this.price*result.amount}});
+                {stock: result.amount, total_sell: -result.amount}});
             res.status(200).json(result);
         })
         .catch(err => {

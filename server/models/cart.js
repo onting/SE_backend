@@ -7,7 +7,8 @@ const cartSchema = mongoose.Schema({
     product_id: {type:ObjectId, required: true},
     payment_method: {type:String, required: true, trim: true},
     amount: {type:Number, default:1},
-    address: {type: String}
+    address: {type: String, required: true},
+    address_detail: {type: String, default: ''}
 },
     {collection: 'carts'}
 );
