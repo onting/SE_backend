@@ -26,7 +26,8 @@ router.post('/', function(req, res, next) { //주문
         product_id: req.body.product_id,
         payment_method: req.body.payment_method,
         amount: req.body.amount,
-        address: req.body.address
+        address: req.body.address,
+        address_detail: req.body.address_detail
     });
 
     cart.save()
@@ -59,7 +60,9 @@ router.patch('/:email',function(req, res, next){ //주문 수정
     Cart.update({email: id}, {$set: {
         payment_method: req.body.payment_method,
         amount: req.body.amount,
-        address: req.body.address}})
+        address: req.body.address,
+        address_detail: req.body.address_detail
+    }})
         .exec()
         .then(result =>{
             console.log(result);

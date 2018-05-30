@@ -24,7 +24,8 @@ router.get('/', function(req, res, next) { //전체 데이터 가져오기
       });
 });
 
-router.post('/product', upload.fields([{name: 'img', maxCount: 1}, {name: 'imgSub', maxCount: 1}]), function(req, res, next){ //상품 추가
+router.post('/product', upload.fields([{name: 'img', maxCount: 1}, 
+          {name: 'imgSub', maxCount: 1}]), function(req, res, next){ //상품 추가
   img = req.files['img'][0];
   imgSub = req.files['imgSub'][0];
   
@@ -50,7 +51,8 @@ router.post('/product', upload.fields([{name: 'img', maxCount: 1}, {name: 'imgSu
       });
 });
 
-router.patch('/product/:prodId', upload.fields([{name: 'img', maxCount: 1}, {name: 'imgSub', maxCount: 1}]), function(req, res, next){ //상품 추가
+router.patch('/product/:prodId', upload.fields([{name: 'img', maxCount: 1}, 
+          {name: 'imgSub', maxCount: 1}]), function(req, res, next){ //상품 추가
   const prodId = res.params.prodId;
   
   img = req.files['img'][0];
@@ -83,8 +85,8 @@ router.get('/image/:sel/:prodId', function(req, res, next){
   var img;
   Product.findById(id)
       .exec()
-      .then(result =>{
-        switch(sel) {
+      .then(result => {
+        switch(Number(sel)) {
           case 1:
             img = result.img;
             break;
@@ -110,7 +112,7 @@ router.get('/image/:sel/:prodId', function(req, res, next){
 
 router.get('/product/:prodId', function(req, res, next) { //특정 아이템 가져오기
   const id = req.params.prodId;
-  Product.findById(id, {img: false})
+  Product.findById(id, {img: false, imgSub: false})
       .exec()
       .then(result =>{
         res.status(200).json(result);
@@ -129,28 +131,19 @@ router.get('/list/:platform/:catalog', function(req, res, next) { //product 리�
   res.redirect('/products/list/' + platform + '/' + catalog + '/' + '1');
 });
 
-router.get('/list/:platform/:catalog/:listnum', function(req, res, next) { //product 리스트
+router.get('/list/:platform/:catalog/:listnum', function(req, res, next){
   const name = req.params.platform;
-  const catalog = req.params.catalog;
+  var catalog;
   const num = req.params.listnum;
   
   if(catalog == 'all') {
-    Product.find({platform: name}, {img: false, imgSub: false})
-      .skip((num-1) * 20)
-      .limit(20)
-      .exec()
-      .then(docs =>{
-        res.status(200).json(docs);
-      })
-      .catch(err =>{
-        console.log(err);
-        res.status(500).json({
-          error: err
-        });
-      });
+    catalog = '*';
   }
   else{
-    Product.find({platform: name, catalog: catalog}, {img: false, imgSub: false})
+    catalog = req.params.catalog;
+  }
+
+  Product.find({platform: name, catalog: catalog}, {img: false, imgSub: false})
       .skip((num-1) * 20)
       .limit(20)
       .exec()
@@ -163,13 +156,42 @@ router.get('/list/:platform/:catalog/:listnum', function(req, res, next) { //pro
           error: err
         });
       });
+})
+
+router.get('/list/:platform/:catalog/:listnum/:sort/:value', function(req, res, next) { //product 리스트
+  const name = req.params.platform;
+  var catalog = req.params.catalog;
+  const num = req.params.listnum;
+  const sort = req.params.sort;
+  const value = req.params.value;
+  
+  if(catalog == 'all') {
+    catalog = '*';
   }
+  else{
+    catalog = req.params.catalog;
+  }
+
+  Product.find({platform: name, catalog: catalog}, {img: false, imgSub: false})
+      .sort({sort : value})
+      .skip((num-1) * 20)
+      .limit(20)
+      .exec()
+      .then(docs =>{
+        res.status(200).json(docs);
+      })
+      .catch(err =>{
+        console.log(err);
+        res.status(500).json({
+          error: err
+        });
+      });
 });
 
-router.get('/review', function(req, res, next){ //리뷰 얻어오기
-  const revId = req.params.revId;
+router.get('/review/:prodId', function(req, res, next){ //리뷰 얻어오기
+  const prodId = req.params.prodId;
 
-  Product.findById(revId)
+  Product.findById(prodId)
       .exec()
       .then(result => {
         res.status(200).json(result);
@@ -183,6 +205,7 @@ router.post('/review/:prodId', function(req, res, next){ //리뷰 작성
   const prodId = req.params.prodId;
   Product.findByIdAndUpdate(prodIdd, {$push: {reviews: {
     _id: new mongoose.Types.ObjectId,
+    title: req.body.title,
     email: req.body.eail,
     content: req.body.content,
     rate: req.body.rate
