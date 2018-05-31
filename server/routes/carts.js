@@ -6,10 +6,10 @@ const Cart = require('../models/cart');
 
 router.get('/:email', function(req, res, next) { //유저별 카트 정보
     const id = req.params.email;
-    Cart.find({email: id})
+    Cart.findOne({email: id})
         .exec()
-        .then(docs =>{
-          res.status(200).json(docs);
+        .then(result =>{
+          res.status(200).json(result);
         })
         .catch(err =>{
           console.log(err);
@@ -23,11 +23,7 @@ router.post('/', function(req, res, next) { //주문
     const cart = new Cart({
         _id: new mongoose.Types.ObjectId(),
         email: req.body.email,
-        product_id: req.body.product_id,
-        payment_method: req.body.payment_method,
-        amount: req.body.amount,
-        address: req.body.address,
-        address_detail: req.body.address_detail
+        order_list: req.body.order_list
     });
 
     cart.save()
@@ -35,31 +31,26 @@ router.post('/', function(req, res, next) { //주문
           res.status(200).json(result);
         })
         .catch(err => {
-            res.status(500).json({
-                error: err
-            })
+            res.status(500).json({error: err})
         });
 });
 
 router.delete('/:email', function(req, res, next){ //카트에서 삭제
     const id = req.params.email;
-    Cart.delete({email: id})
+    Carts.delete({email: id})
         .exec()
         .then(result => {
             res.status(200).json(result);
         })
-        .catch(err =>{
-            res.status(500).json({
-                error: err
-            });
-        });
+        .catch(err => {
+            res.status(500).json({error: err})
+        })
 });
 
 router.patch('/:email',function(req, res, next){ //주문 수정
     const id = req.params.email;
     Cart.update({email: id}, {$set: {
-        payment_method: req.body.payment_method,
-        amount: req.body.amount,
+        order_list: req.body.order_list,
         address: req.body.address,
         address_detail: req.body.address_detail
     }})

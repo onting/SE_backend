@@ -4,11 +4,10 @@ const ObjectId = mongoose.Schema.ObjectId;
 const cartSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     email: {type:String, require:true},
-    product_id: {type:ObjectId, required: true},
-    payment_method: {type:String, required: true, trim: true},
-    amount: {type:Number, default:1},
-    address: {type: String, required: true},
-    address_detail: {type: String, default: ''}
+    order_list: [{
+        product_id: ObjectId,
+        amount: {type: Number, default: 1, min: 1}
+    }]
 },
     {collection: 'carts'}
 );

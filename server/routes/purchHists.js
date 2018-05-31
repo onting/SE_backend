@@ -4,26 +4,39 @@ var mongoose = require('mongoose');
 
 const PurchHist = require('../models/purchHist');
 const Product = require('../models/product');
+const Cart = require('../models/cart');
 
-router.post('/', function(req, res, next){ //주문 완료
-    const purchHist = new PurchHist({
-        _id: new mongoose.Types.ObjectId,
-        email: req.body.email,
-        product_id: req.body.product_id,
-        payment_method: req.body.payment_method,
-        amount: req.body.amount,
-        address: req.body.address,
-        address_detail: req.body.address_detail,
-        purchase_date: req.body.purchase_date
-    });
-    purchHist.save()
+router.post('/:email', function(req, res, next){ //카트에서 가져오기
+    const email = req.params.email;
+
+    Cart.findOneAndRemove({email: email})
+        .exec()
         .then(result => {
-            res.status(200).json(result)
+            if(result) {
+                const purchHist = new PurchHist({
+                    _id: new mongoose.Types.ObjectId,
+                    email: result.email,
+                    order_list: result.order_list,
+                    payment_method: req.body.payment_method,
+                    amount: req.body.amount,
+                    address: req.body.address,
+                    address_detail: req.body.address_detail,
+                    purchase_date: req.body.purchase_date
+                });
+                purchHist.save()
+                    .exec()
+                    .then(result => {
+                        res.status(200).json(result)
+                    })
+            }
+            else{
+                res.status(300).end();
+            }
         })
         .catch(err => {
-            console.log(err);
             res.status(500).json({error: err})
         })
+    
 })
 
 router.patch('/receive/:purchId', function(req, res, next){ //상품 수령
@@ -52,7 +65,6 @@ router.patch('/return/:purchId', function(req, res, next){ //상품 반품
             Product.findByIdAndUpdate(result.product_id, {$inc: {stock: result.amount, total_sell: -result.amount}})
                 .exec();
             res.status(200).json(result);
-            
         })
         .catch(err => {
             res.status(500).json({
