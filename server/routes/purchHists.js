@@ -33,15 +33,8 @@ router.patch('/receive/:purchId', function(req, res, next){ //상품 수령
         .exec()
         .then(result => {
             Product.findByIdAndUpdate(result.product_id, {$inc: {stock: -result.amount, total_sell: result.amount}})
-                .exec()
-                .then(result => {
-                    res.status(200).json(result);
-                })
-                .catch(err => {
-                    res.status(500).json({
-                        error: err
-                    })
-                })
+                .exec();
+            res.status(200).json(result);
         })
         .catch(err => {
             res.status(500).json({
@@ -56,9 +49,13 @@ router.patch('/return/:purchId', function(req, res, next){ //상품 반품
     PurchHist.findByIdAndUpdate(purchId, {$set: {return: true}})
         .exec()
         .then(result => {
-            Product.findByIdAndUpdate(result.product_id, {$inc: 
-                {stock: result.amount, total_sell: -result.amount}});
-            res.status(200).json(result);
+            Product.findByIdAndUpdate(result.product_id, {$inc: {stock: result.amount, total_sell: -result.amount}})
+                .exec()
+                .then(result => {
+                    result.img = undefined;
+                    result.imgSub = undefined;
+                    res.status(200).json(result);});
+            
         })
         .catch(err => {
             res.status(500).json({
@@ -70,7 +67,7 @@ router.patch('/return/:purchId', function(req, res, next){ //상품 반품
 
 router.get('/:email', function(req, res, next){ //사용자 구매기록 조회
     const id = req.params.email;
-    Cart.find({email: id})
+    PurchHist.find({email: id})
         .exec()
         .then(docs =>{
           res.status(200).json(docs);
