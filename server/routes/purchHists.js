@@ -65,6 +65,21 @@ router.patch('/return/:purchId', function(req, res, next){ //상품 반품
 
 });
 
+router.get('/', function(req, res, next){ //사용자 구매기록 조회
+    PurchHist.find()
+        .exec()
+        .limit(30)
+        .then(docs =>{
+          res.status(200).json(docs);
+        })
+        .catch(err =>{
+          console.log(err);
+          res.status(500).json({
+            error: err
+          });
+        });
+});
+
 router.get('/:email', function(req, res, next){ //사용자 구매기록 조회
     const id = req.params.email;
     PurchHist.find({email: id})
@@ -79,5 +94,18 @@ router.get('/:email', function(req, res, next){ //사용자 구매기록 조회
           });
         });
 });
+
+router.get('/:histId', function(req, res, next){
+    const id = req.params.histId;
+
+    PurchHist.findById(id)
+        .exec()
+        .then(result => {
+            res.status.json(result);
+        })
+        .catch(err => {
+            res.status.json({error: err});
+        })
+})
 
 module.exports = router;
