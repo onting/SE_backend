@@ -10,3 +10,5 @@ cd server
 npm start
 ```
 이후 3001포트에 접속하여 통신한다.
+##바깥고리
+[프론트 엔드 저장소](https://github.com/cocoapi/SE_webpage)
