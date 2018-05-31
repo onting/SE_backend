@@ -50,11 +50,8 @@ router.patch('/return/:purchId', function(req, res, next){ //상품 반품
         .exec()
         .then(result => {
             Product.findByIdAndUpdate(result.product_id, {$inc: {stock: result.amount, total_sell: -result.amount}})
-                .exec()
-                .then(result => {
-                    result.img = undefined;
-                    result.imgSub = undefined;
-                    res.status(200).json(result);});
+                .exec();
+            res.status(200).json(result);
             
         })
         .catch(err => {
