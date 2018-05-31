@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const productSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    name: {type: String, required: true, trim: true},
+    name: {type: String, required: true, trim: true, unique: true},
     catalog: {type: String, required: true, trim: true},
     platform: {type: String, required: true, trim: true},
     provider: {type: String, required: false},
@@ -14,6 +14,7 @@ const productSchema = mongoose.Schema({
     imgSub: {data: Buffer, contentType: String},
     reviews: [{
         _id: mongoose.Schema.Types.ObjectId,
+        title: {type: String, trim: true},                                                                                   
         email: {type: String, required: true, trim: true},
         content: String,
         rate: {type: Number, default: 5, min: 1}
