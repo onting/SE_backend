@@ -132,18 +132,19 @@ router.get('/list/:platform/:catalog', function(req, res, next) { //product 리�
 });
 
 router.get('/list/:platform/:catalog/:listnum', function(req, res, next){
-  const name = req.params.platform;
-  var catalog;
+  const platform = req.params.platform;
+  const catalog = req.params.catalog;
   const num = req.params.listnum;
+  var query = {};
   
-  if(catalog == 'all') {
-    catalog = '*';
+  if(platform != 'all') {
+    query.platform = platform;
   }
-  else{
-    catalog = req.params.catalog;
+  if(catalog != 'all') {
+    query.catalog = catalog;
   }
 
-  Product.find({platform: name, catalog: catalog}, {img: false, imgSub: false})
+  Product.find(query, {img: false, imgSub: false})
       .skip((num-1) * 20)
       .limit(20)
       .exec()
@@ -159,20 +160,21 @@ router.get('/list/:platform/:catalog/:listnum', function(req, res, next){
 })
 
 router.get('/list/:platform/:catalog/:listnum/:sort/:value', function(req, res, next) { //product 리스트
-  const name = req.params.platform;
-  var catalog = req.params.catalog;
+  const platform = req.params.platform;
+  const catalog = req.params.catalog;
   const num = req.params.listnum;
   const sort = req.params.sort;
   const value = req.params.value;
+  var query = {};
   
-  if(catalog == 'all') {
-    catalog = '*';
+  if(platform != 'all') {
+    query.platform = platform;
   }
-  else{
-    catalog = req.params.catalog;
+  if(catalog != 'all') {
+    query.catalog = catalog;
   }
 
-  Product.find({platform: name, catalog: catalog}, {img: false, imgSub: false})
+  Product.find(query, {img: false, imgSub: false})
       .sort({sort : value})
       .skip((num-1) * 20)
       .limit(20)
