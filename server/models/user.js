@@ -6,11 +6,11 @@ const userSchema = mongoose.Schema({
     email: {type: String, required: true, unique: true},
     password: {type:String, required: true, trim: true},
     nickname: {type:String, required: true, trim: true, unique: true},
-    post_code: {type: Number, required: true},
+    post_code: {type: String, required: true},
     address : {type:String, required: true},
     address_detail: {type: String, default: ''},
     phone: {type:String, required: true},
-    role: {type: String, default:'user'}
+    role: {type: Boolean, default: false}
 },
     {collection: 'users'}
 );
