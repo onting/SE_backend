@@ -10,7 +10,7 @@ const Product = require('../models/product');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) { //전체 데이터 가져오기
-  Product.find({}, {img: false})
+  Product.find({}, {img: false, imgSub: false})
       .exec()
       .then(docs =>{
         console.log(docs);
