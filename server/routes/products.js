@@ -35,6 +35,7 @@ router.post('/product', upload.fields([{name: 'img', maxCount: 1},
     catalog: req.body.catalog,
     platform: req.body.platform,
     provider: req.body.provider,
+    release_date: req.body.release_date,
     img : {data: img.buffer, contentType: 'image/' + img.originalname.split('.').pop()},
     imgSub: {data: imgSub.buffer, contentType: 'image/' + imgSub.originalname.split('.').pop()},
     price: req.body.price,
@@ -205,7 +206,7 @@ router.get('/review/:prodId', function(req, res, next){ //리뷰 얻어오기
 
 router.post('/review/:prodId', function(req, res, next){ //리뷰 작성
   const prodId = req.params.prodId;
-  Product.findByIdAndUpdate(prodIdd, {$push: {reviews: {
+  Product.findByIdAndUpdate(prodId, {$push: {reviews: {
     _id: new mongoose.Types.ObjectId,
     title: req.body.title,
     email: req.body.eail,
