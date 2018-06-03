@@ -166,6 +166,9 @@ router.get('/list/:platform/:catalog/:listnum/:sort/:value', function(req, res, 
   const sort = req.params.sort;
   const value = req.params.value;
   var query = {};
+  var s = {};
+
+  s[sort] = value;
   
   if(platform != 'all') {
     query.platform = platform;
@@ -175,7 +178,7 @@ router.get('/list/:platform/:catalog/:listnum/:sort/:value', function(req, res, 
   }
 
   Product.find(query, {img: false, imgSub: false})
-      .sort({sort : value})
+      .sort(s)
       .skip((num-1) * 20)
       .limit(20)
       .exec()
