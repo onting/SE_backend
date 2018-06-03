@@ -217,7 +217,7 @@ router.post('/review/:prodId', function(req, res, next){ //리뷰 작성
 router.get('/review/:prodId', function(req, res, next){
   const prodId = req.params.prodId;
 
-  Product.findById(prodId)
+  Product.findById(prodId, {reviews: true, img: false, imgSub: false})
       .exec()
       .then(result => {
         res.status(200).json(result.reviews);
@@ -232,7 +232,7 @@ router.get('/review/:prodId/:rate', function(req, res, next){
   const rate = req.params.rate;
   var result;
 
-  Product.findById(prodId)
+  Product.findById(prodId, {reviews: true, img: false, imgSub: false})
       .exec()
       .then(doc => {
         result = doc.reviews.filter(function(elem){
