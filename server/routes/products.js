@@ -199,7 +199,7 @@ router.post('/review/:prodId', function(req, res, next){ //리뷰 작성
   Product.findByIdAndUpdate(prodId, {$push: {reviews: {
     _id: new mongoose.Types.ObjectId,
     title: req.body.title,
-    email: req.body.eail,
+    email: req.body.email,
     content: req.body.content,
     rate: req.body.rate
   }}})
@@ -268,6 +268,46 @@ router.patch('/review/:prodId/:revId', function(req, res, next){ //리뷰 수정
       .catch(err => {
         res.status(500).json({error: err});
       })
+})
+
+router.get('/sell', function(req, res, next){
+  var ts = {};
+
+  Product.find({platform: "XBOX"})
+      .exec()
+      .then(docs => {
+        if(docs && docs.length){
+          ts.XBOX = docs.map(ele => ele.total_sell)
+            .reduce(function(acc, val){return acc+val;});
+        }
+      })
+      .catch(err => {
+        res.status(500).json({error: err});
+      });
+  Product.find({platform: "Nintendo"})
+      .exec()
+      .then(docs => {
+        if(docs && docs.length){
+          ts.Nintendo = docs.map(ele => ele.total_sell)
+            .reduce(function(acc, val){return acc+val;});
+        }
+      })
+      .catch(err => {
+        res.status(500).json({error: err});
+      });
+  Product.find({platform: "PlayStation"})
+      .exec()
+      .then(docs => {
+        if(docs && docs.length) {
+          ts.PlayStation = docs.map(ele => ele.total_sell)
+            .reduce(function(acc, val){return acc+val;});
+        }
+      })
+      .catch(err => {
+        res.status(500).json({error: err});
+      });
+
+  res.status(200).json(ts);
 })
 
 module.exports = router;
