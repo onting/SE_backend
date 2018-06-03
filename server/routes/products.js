@@ -191,6 +191,21 @@ router.get('/list/:platform/:catalog/:listnum/:sort/:value', function(req, res, 
       });
 });
 
+router.delete('/product/:prodId', function(req, res, next){ // 특성 product 삭제
+  const id = req.params.prodId;
+  User.remove({_id : id})
+      .exec()
+      .then(result =>{
+        res.status(200).json(result);
+      })
+      .catch(err =>{
+        console.log(err);
+        res.status(500).json({
+          error: err
+        });
+      });
+});
+
 router.get('/review/:prodId', function(req, res, next){ //리뷰 얻어오기
   const prodId = req.params.prodId;
 
