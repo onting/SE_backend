@@ -111,21 +111,6 @@ router.get('/image/:sel/:prodId', function(req, res, next){
       });
 })
 
-router.get('/product/:prodId', function(req, res, next) { //특정 아이템 가져오기
-  const id = req.params.prodId;
-  Product.findById(id, {img: false, imgSub: false})
-      .exec()
-      .then(result =>{
-        res.status(200).json(result);
-      })
-      .catch(err =>{
-        console.log(err);
-        res.status(500).json({
-          error: err
-        });
-      });
-});
-
 router.get('/list/:platform/:catalog', function(req, res, next) { //product 리스트
   const platform = req.params.platform;
   const catalog = req.params.catalog;
@@ -196,7 +181,7 @@ router.get('/list/:platform/:catalog/:listnum/:sort/:value', function(req, res, 
 
 router.delete('/product/:prodId', function(req, res, next){ // 특성 product 삭제
   const id = req.params.prodId;
-  Product.remove({_id : id})
+  Product.findByIdAndRemove(id)
       .exec()
       .then(result =>{
         res.status(200).json(result);
@@ -208,19 +193,6 @@ router.delete('/product/:prodId', function(req, res, next){ // 특성 product �
         });
       });
 });
-
-router.get('/review/:prodId', function(req, res, next){ //리뷰 얻어오기
-  const prodId = req.params.prodId;
-
-  Product.findById(prodId)
-      .exec()
-      .then(result => {
-        res.status(200).json(result);
-      })
-      .catch(err => {
-        res.status(500).json({error: err});
-      })
-})
 
 router.post('/review/:prodId', function(req, res, next){ //리뷰 작성
   const prodId = req.params.prodId;
@@ -288,7 +260,7 @@ router.delete('/review/:prodId/:revId', function(req, res, next){ //리뷰 삭�
 router.patch('/review/:prodId/:revId', function(req, res, next){ //리뷰 수정
   const prodId = req.params.prodId;
   const revId = req.params.revId;
-  Product.findByIdANdUpdate(prodId, {$set: {"reviews.$.content": req.body.content, "reviews.$.rate": req.body.rate}})
+  Product.findByIdAndUpdate(prodId, {$set: {"reviews.$.content": req.body.content, "reviews.$.rate": req.body.rate}})
       .exec()
       .then(result => {
         res.status(200).json(result);

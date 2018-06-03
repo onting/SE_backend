@@ -23,14 +23,11 @@ router.get('/:num', function(req, res, next) { //전체 데이터 가져오기
 
 router.post('/:num', upload.single('img'), function(req, res, next) {
   const num = req.params.num;
-  const ad = new Ad({
-    _id: new mongoose.Types.ObjectId(),
-    num: num,
-    img: {data: req.file.buffer, contentType: 'image/' + req.file.originalname.split('.').pop()}
-  })
-  ad.save()
+  const img = {data: req.file.buffer, contentType: 'image/' + req.file.originalname.split('.').pop()};
+  
+  Ad.update({num: num}, {$set: {img: img}}, {upsert: true})
       .then(result => {
-        res.status(200).json(result._id);
+        res.status(200).end();
       })
       .catch(err => {
         console.log(err);
