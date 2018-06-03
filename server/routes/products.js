@@ -193,7 +193,7 @@ router.get('/list/:platform/:catalog/:listnum/:sort/:value', function(req, res, 
 
 router.delete('/product/:prodId', function(req, res, next){ // 특성 product 삭제
   const id = req.params.prodId;
-  User.remove({_id : id})
+  Product.remove({_id : id})
       .exec()
       .then(result =>{
         res.status(200).json(result);
