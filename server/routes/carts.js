@@ -37,7 +37,7 @@ router.post('/', function(req, res, next) { //주문
 
 router.delete('/:email', function(req, res, next){ //카트에서 삭제
     const id = req.params.email;
-    Carts.delete({email: id})
+    Cart.delete({email: id})
         .exec()
         .then(result => {
             res.status(200).json(result);

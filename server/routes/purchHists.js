@@ -34,9 +34,8 @@ router.post('/:email', function(req, res, next){ //카트에서 가져오기
             }
         })
         .catch(err => {
-            res.status(500).json({error: err})
+            res.status(500).json({error: err});
         })
-    
 })
 
 router.patch('/receive/:purchId', function(req, res, next){ //상품 수령
@@ -45,8 +44,10 @@ router.patch('/receive/:purchId', function(req, res, next){ //상품 수령
     PurchHist.findByIdAndUpdate(purchId, {$set: {receive_date: Date.now()}})
         .exec()
         .then(result => {
-            Product.findByIdAndUpdate(result.product_id, {$inc: {stock: -result.amount, total_sell: result.amount}})
-                .exec();
+            result.order_list.map(res => {
+                Product.findByIdAndUpdate(res.product_id, {$inc: {stock: -res.order_list, total_sell: res.amount}})
+                    .exec();
+            })
             res.status(200).json(result);
         })
         .catch(err => {
@@ -62,8 +63,10 @@ router.patch('/return/:purchId', function(req, res, next){ //상품 반품
     PurchHist.findByIdAndUpdate(purchId, {$set: {return: true}})
         .exec()
         .then(result => {
-            Product.findByIdAndUpdate(result.product_id, {$inc: {stock: result.amount, total_sell: -result.amount}})
-                .exec();
+            result.order_list.map(res => {
+                Product.findByIdAndUpdate(res.product_id, {$inc: {stock: res.order_list, total_sell: -res.amount}})
+                    .exec();
+            })
             res.status(200).json(result);
         })
         .catch(err => {
