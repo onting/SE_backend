@@ -49,11 +49,7 @@ router.delete('/:email', function(req, res, next){ //카트에서 삭제
 
 router.patch('/:email',function(req, res, next){ //주문 수정
     const id = req.params.email;
-    Cart.update({email: id}, {$set: {
-        order_list: req.body.order_list,
-        address: req.body.address,
-        address_detail: req.body.address_detail
-    }})
+    Cart.update({email: id}, {$set: {order_list: req.body.order_list}})
         .exec()
         .then(result =>{
             console.log(result);
