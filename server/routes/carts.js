@@ -18,22 +18,6 @@ router.get('/:email', function(req, res, next) { //유저별 카트 정보
           });
         });
 });
-  
-router.post('/', function(req, res, next) { //주문
-    const cart = new Cart({
-        _id: new mongoose.Types.ObjectId(),
-        email: req.body.email,
-        order_list: req.body.order_list
-    });
-
-    cart.save()
-        .then(result => {
-          res.status(200).json(result);
-        })
-        .catch(err => {
-            res.status(500).json({error: err})
-        });
-});
 
 router.delete('/:email', function(req, res, next){ //카트에서 삭제
     const id = req.params.email;
@@ -49,10 +33,12 @@ router.delete('/:email', function(req, res, next){ //카트에서 삭제
 
 router.patch('/:email',function(req, res, next){ //주문 수정
     const id = req.params.email;
-    Cart.update({email: id}, {$set: {order_list: req.body.order_list}})
+    Cart.update({email: id}, {$set: {order_list: req.body.order_list}, 
+        $setOnInsert: {_id: new mongoose.Types.ObjectId,
+        email: req.body.email,
+        order_list: req.body.order_list}}, {upsert: true})
         .exec()
-        .then(result =>{
-            console.log(result);
+        .then(result => {
             res.status(200).json(result);
           })
           .catch(err => {

@@ -13,7 +13,6 @@ router.get('/', function(req, res, next) { //전체 데이터 가져오기
   Product.find({}, {img: false, imgSub: false})
       .exec()
       .then(docs =>{
-        console.log(docs);
         res.status(200).json(docs);
       })
       .catch(err =>{
@@ -23,6 +22,19 @@ router.get('/', function(req, res, next) { //전체 데이터 가져오기
         });
       });
 });
+
+router.get('/search/:keyword', function(req, res, next){
+  const keyword = req.params.keyword;
+  Product.find({name: {$regex: keyword, $options: 'ix'}}, {img: false, imgSub: false})
+      .exec()
+      .then(docs => {
+        res.status(200).json(docs);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({error: err});
+      })
+})
 
 router.post('/product', upload.fields([{name: 'img', maxCount: 1}, 
           {name: 'imgSub', maxCount: 1}]), function(req, res, next){ //상품 추가
@@ -54,10 +66,10 @@ router.post('/product', upload.fields([{name: 'img', maxCount: 1},
 
 router.patch('/product/:prodId', upload.fields([{name: 'img', maxCount: 1}, 
           {name: 'imgSub', maxCount: 1}]), function(req, res, next){ //상품 추가
-  const prodId = res.params.prodId;
+  const prodId = req.params.prodId;
   
-  img = req.files['img'][0];
-  imgSub = req.files['imgSub'][0];
+  img = req.files['img'] ? req.files['img'][0] : undefined;
+  imgSub = req.files['imgSub'] ? req.files['imgSub'][0] : undefined;
 
   Product.findByIdAndUpdate(prodId, {$set: {
     name: req.body.name,
@@ -67,9 +79,8 @@ router.patch('/product/:prodId', upload.fields([{name: 'img', maxCount: 1},
     release_date: req.body.release_date,
     price: req.body.price,
     stock: req.body.stock,
-    total_sell: req.body.total_sell,
-    img: {data: img.buffer, contentType: 'image/' + img.originalname.split('.').pop()},
-    imgSub: {data: imgSub.buffer, contentType: 'image/' + imgSub.originalname.split('.').pop()}
+    img: img ? {data: img.buffer, contentType: 'image/' + img.originalname.split('.').pop()} : this.img,
+    imgSub: imgSub ? {data: imgSub.buffer, contentType: 'image/' + imgSub.originalname.split('.').pop()} : this.imgSub
   }})
       .exec()
       .then(result =>{
@@ -131,8 +142,8 @@ router.get('/list/:platform/:catalog/:listnum', function(req, res, next){
   }
 
   Product.find(query, {img: false, imgSub: false})
-      .skip((num-1) * 20)
-      .limit(20)
+      .skip((num-1) * 12)
+      .limit(12)
       .exec()
       .then(docs =>{
         res.status(200).json(docs);
@@ -165,8 +176,8 @@ router.get('/list/:platform/:catalog/:listnum/:sort/:value', function(req, res, 
 
   Product.find(query, {img: false, imgSub: false})
       .sort(s)
-      .skip((num-1) * 20)
-      .limit(20)
+      .skip((num-1) * 12)
+      .limit(12)
       .exec()
       .then(docs =>{
         res.status(200).json(docs);
