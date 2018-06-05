@@ -16,7 +16,6 @@ router.post('/hist', function(req, res, next){ //카트에서 가져오기
         name_recv: req.body.name_recv,
         phone_recv: req.body.phone_recv,
         post_code: req.body.post_code,
-        amount: req.body.amount,
         address: req.body.address,
         address_detail: req.body.address_detail,
         purchase_date: req.body.purchase_date
@@ -49,7 +48,6 @@ router.post('/hist/move/:email', function(req, res, next){ //카트에서 가져
                     name_recv: req.body.name_recv,
                     phone_recv: req.body.phone_recv,
                     post_code: req.body.post_code,
-                    amount: req.body.amount,
                     address: req.body.address,
                     address_detail: req.body.address_detail,
                     purchase_date: req.body.purchase_date
