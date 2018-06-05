@@ -13,7 +13,7 @@ const purchHistSchema = mongoose.Schema({
     post_code: {type: String, required: true},
     address: {type: String, required: true},
     address_detail: {type: String, default: ''},
-    purchase_date: {type: Date, required: true},
+    purchase_date: {type: Date, default: Date.now()},
     receive_date: Date,
     return: {type: Boolean, default: false}
 },

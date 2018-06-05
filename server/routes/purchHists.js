@@ -16,7 +16,6 @@ router.post('/hist', function(req, res, next){ //카트에서 가져오기
         name_recv: req.body.name_recv,
         phone_recv: req.body.phone_recv,
         post_code: req.body.post_code,
-        amount: req.body.amount,
         address: req.body.address,
         address_detail: req.body.address_detail,
         purchase_date: req.body.purchase_date
@@ -49,7 +48,6 @@ router.post('/hist/move/:email', function(req, res, next){ //카트에서 가져
                     name_recv: req.body.name_recv,
                     phone_recv: req.body.phone_recv,
                     post_code: req.body.post_code,
-                    amount: req.body.amount,
                     address: req.body.address,
                     address_detail: req.body.address_detail,
                     purchase_date: req.body.purchase_date
@@ -152,6 +150,7 @@ router.get('/date', function(req, res, next){
 })
 
 router.get('/sell', function(req, res, next){
+    var result = [];
     PurchHist.find({ 
         receive_date : { 
           $lt: new Date(), 
@@ -162,9 +161,13 @@ router.get('/sell', function(req, res, next){
             Product.find({_id: {$in:docs.map(ele => ele.product_id)}})
                 .exec()
                 .then(docs => {
-                    console.log(docs);
-                    var result = docs.map(ele => ele.total_sell).reduce(function(acc, val){
-                      return acc+val;}, 0);
+                    for(var i=0; i<5; i++){
+                        result.push(docs.filter(function(elem){
+                            (elem <= (new Date(new Date().setDate(new Date().getDate() - i))))
+                            && (elem >= (new Date(new Date().setDate(new Date().getDate() - (i+1)))))
+                        }).map(ele => ele.total_sell).reduce(function(acc, val){
+                            return acc+val;}, 0));
+                    }
                   res.status(200).json(result);  
                 })
         })
