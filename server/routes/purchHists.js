@@ -11,6 +11,7 @@ router.post('/hist', function(req, res, next){ //카트에서 가져오기
         _id: new mongoose.Types.ObjectId,
         email: req.body.email,
         name: req.body.name,
+        phone: req.body.phone,
         order_list: req.body.order_list,
         payment_method: req.body.payment_method,
         name_recv: req.body.name_recv,
@@ -24,7 +25,7 @@ router.post('/hist', function(req, res, next){ //카트에서 가져오기
         .exec()
         .then(result => {
             Cart.remove({email: email})
-                .exec()
+                .exec();
             res.status(200).json(result);
         })
         .catch(err => {
@@ -35,13 +36,15 @@ router.post('/hist', function(req, res, next){ //카트에서 가져오기
 
 router.post('/hist/move/:email', function(req, res, next){ //카트에서 가져오기
     const email = req.params.email;
-    Cart.findOneAndRemove({email: email})
+    Cart.findOne({email: email})
         .exec()
         .then(result => {
+            console.log(result);
             if(result) {
                 const purchHist = new PurchHist({
                     _id: new mongoose.Types.ObjectId,
                     name: req.body.name,
+                    phone: req.body.phone,
                     email: result.email,
                     order_list: result.order_list,
                     payment_method: req.body.payment_method,
@@ -55,6 +58,8 @@ router.post('/hist/move/:email', function(req, res, next){ //카트에서 가져
                 purchHist.save()
                     .exec()
                     .then(result => {
+                        Cart.remove({email: email})
+                            .exec();
                         res.status(200).json(result)
                     })
             }
@@ -152,7 +157,7 @@ router.get('/date', function(req, res, next){
 router.get('/sell', function(req, res, next){
     var result = [];
     PurchHist.find({ 
-        receive_date : { 
+        purchase_date : { 
           $lt: new Date(), 
           $gte: new Date(new Date().setDate(new Date().getDate() - 5))}
         })
