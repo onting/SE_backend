@@ -17,6 +17,7 @@ router.get('/:num', function(req, res, next) { //전체 데이터 가져오기
       res.end(result.img.data);
     })
     .catch(err => {
+      console.log(err);
       res.end(err);
     })
 });

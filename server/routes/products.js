@@ -282,43 +282,86 @@ router.patch('/review/:prodId/:revId', function(req, res, next){ //리뷰 수정
 })
 
 router.get('/sell', function(req, res, next){
-  var ts = {};
+  var ts = {
+    XBOX: {hardware: 0, title: 0},
+    Nintendo: {hardware: 0, title: 0},
+    PlayStation: {hardware: 0, title: 0}
+  };
 
-  Product.find({platform: "XBOX"})
+  Product.find({}, {total_sell: true, platform: true, catalog: true})
       .exec()
       .then(docs => {
-        if(docs && docs.length){
-          ts.XBOX = docs.map(ele => ele.total_sell)
-            .reduce(function(acc, val){return acc+val;});
-        }
+        ts.XBOX.hardware = docs.filter(function(elem){
+          return (elem.platform == "XBOX") && (elem.catalog == "hardware");}).map(ele => ele.total_sell).reduce(function(acc, val){
+            return acc+val
+          }, 0);
+        ts.XBOX.title = docs.filter(function(elem){
+          return (elem.platform == "XBOX") && (elem.catalog == "title");}).map(ele => ele.total_sell).reduce(function(acc, val){
+            return acc+val
+          }, 0);
+        ts.Nintendo.hardware = docs.filter(function(elem){
+          return (elem.platform == "Nintendo") && (elem.catalog == "hardware");}).map(ele => ele.total_sell).reduce(function(acc, val){
+            return acc+val
+          }, 0);
+        ts.Nintendo.title = docs.filter(function(elem){
+          return (elem.platform == "Nintendo") && (elem.catalog == "title");}).map(ele => ele.total_sell).reduce(function(acc, val){
+            return acc+val
+          }, 0);
+        ts.PlayStation.hardware = docs.filter(function(elem){
+          return (elem.platform == "PlayStation") && (elem.catalog == "hardware");}).map(ele => ele.total_sell).reduce(function(acc, val){
+            return acc+val
+          }, 0);
+        ts.PlayStation.title = docs.filter(function(elem){
+          return (elem.platform == "PlayStation") && (elem.catalog == "title");}).map(ele => ele.total_sell).reduce(function(acc, val){
+            return acc+val
+          }, 0);
+        res.status(200).json(ts);
       })
       .catch(err => {
-        res.status(500).json({error: err});
-      });
-  Product.find({platform: "Nintendo"})
-      .exec()
-      .then(docs => {
-        if(docs && docs.length){
-          ts.Nintendo = docs.map(ele => ele.total_sell)
-            .reduce(function(acc, val){return acc+val;});
-        }
+        res.status(500).json({error: err})
       })
-      .catch(err => {
-        res.status(500).json({error: err});
-      });
-  Product.find({platform: "PlayStation"})
-      .exec()
-      .then(docs => {
-        if(docs && docs.length) {
-          ts.PlayStation = docs.map(ele => ele.total_sell)
-            .reduce(function(acc, val){return acc+val;});
-        }
-      })
-      .catch(err => {
-        res.status(500).json({error: err});
-      });
+})
 
-  res.status(200).json(ts);
+router.get('/sell', function(req, res, next){
+  var ts = {
+    XBOX: {hardware: 0, title: 0},
+    Nintendo: {hardware: 0, title: 0},
+    PlayStation: {hardware: 0, title: 0}
+  };
+
+  Product.find({}, {total_sell: true, platform: true, catalog: true})
+      .exec()
+      .then(docs => {
+        ts.XBOX.hardware = docs.filter(function(elem){
+          return (elem.platform == "XBOX") && (elem.catalog == "hardware");}).map(ele => ele.total_sell).reduce(function(acc, val){
+            return acc+val
+          }, 0);
+        ts.XBOX.title = docs.filter(function(elem){
+          return (elem.platform == "XBOX") && (elem.catalog == "title");}).map(ele => ele.total_sell).reduce(function(acc, val){
+            return acc+val
+          }, 0);
+        ts.Nintendo.hardware = docs.filter(function(elem){
+          return (elem.platform == "Nintendo") && (elem.catalog == "hardware");}).map(ele => ele.total_sell).reduce(function(acc, val){
+            return acc+val
+          }, 0);
+        ts.Nintendo.title = docs.filter(function(elem){
+          return (elem.platform == "Nintendo") && (elem.catalog == "title");}).map(ele => ele.total_sell).reduce(function(acc, val){
+            return acc+val
+          }, 0);
+        ts.PlayStation.hardware = docs.filter(function(elem){
+          return (elem.platform == "PlayStation") && (elem.catalog == "hardware");}).map(ele => ele.total_sell).reduce(function(acc, val){
+            return acc+val
+          }, 0);
+        ts.PlayStation.title = docs.filter(function(elem){
+          return (elem.platform == "PlayStation") && (elem.catalog == "title");}).map(ele => ele.total_sell).reduce(function(acc, val){
+            return acc+val
+          }, 0);
+        res.status(200).json(ts);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({error: err})
+      })
 })
 
 module.exports = router;

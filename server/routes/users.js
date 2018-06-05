@@ -6,7 +6,7 @@ const User = require('../models/user');
 const Cart = require('../models/cart');
 
 router.get('/', function(req, res, next) { 
-  User.find()
+  User.find({role: false})
       .exec()
       .then(docs =>{
         console.log(docs);
