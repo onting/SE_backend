@@ -23,7 +23,7 @@ router.post('/hist', function(req, res, next){ //카트에서 가져오기
     })
     purchHist.save()
         .then(result => {
-            Cart.remove({email: email})
+            Cart.remove({email: req.body.email})
                 .exec();
             res.status(200).json(result);
         })
@@ -56,6 +56,10 @@ router.post('/hist/move/:email', function(req, res, next){ //카트에서 가져
                 });
                 purchHist.save()
                     .then(result => {
+                        result.order_list.map(res => {
+                            Product.findByIdAndUpdate(res.product_id, {$inc: {stock: -res.order_list, total_sell: res.amount}})
+                                .exec();
+                        })
                         Cart.remove({email: email})
                             .exec();
                         res.status(200).json(result)
@@ -77,10 +81,6 @@ router.patch('/hist/receive/:purchId', function(req, res, next){ //상품 수령
     PurchHist.findByIdAndUpdate(purchId, {$set: {receive_date: Date.now()}})
         .exec()
         .then(result => {
-            result.order_list.map(res => {
-                Product.findByIdAndUpdate(res.product_id, {$inc: {stock: -res.order_list, total_sell: res.amount}})
-                    .exec();
-            })
             res.status(200).json(result);
         })
         .catch(err => {
