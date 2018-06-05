@@ -22,7 +22,6 @@ router.post('/hist', function(req, res, next){ //카트에서 가져오기
         purchase_date: req.body.purchase_date
     })
     purchHist.save()
-        .exec()
         .then(result => {
             Cart.remove({email: email})
                 .exec();
@@ -56,7 +55,6 @@ router.post('/hist/move/:email', function(req, res, next){ //카트에서 가져
                     purchase_date: req.body.purchase_date
                 });
                 purchHist.save()
-                    .exec()
                     .then(result => {
                         Cart.remove({email: email})
                             .exec();
