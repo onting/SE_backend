@@ -6,7 +6,7 @@ const PurchHist = require('../models/purchHist');
 const Product = require('../models/product');
 const Cart = require('../models/cart');
 
-router.post('/:email', function(req, res, next){ //카트에서 가져오기
+router.post('/hist/:email', function(req, res, next){ //카트에서 가져오기
     const email = req.params.email;
 
     Cart.findOneAndRemove({email: email})
@@ -34,11 +34,12 @@ router.post('/:email', function(req, res, next){ //카트에서 가져오기
             }
         })
         .catch(err => {
+            console.log(err);
             res.status(500).json({error: err});
         })
 })
 
-router.patch('/receive/:purchId', function(req, res, next){ //상품 수령
+router.patch('/hist/receive/:purchId', function(req, res, next){ //상품 수령
     const purchId = req.params.purchId;
 
     PurchHist.findByIdAndUpdate(purchId, {$set: {receive_date: Date.now()}})
@@ -51,13 +52,12 @@ router.patch('/receive/:purchId', function(req, res, next){ //상품 수령
             res.status(200).json(result);
         })
         .catch(err => {
-            res.status(500).json({
-                error: err
-            })
+            console.log(err);
+            res.status(500).json({error: err})
         });
 })
 
-router.patch('/return/:purchId', function(req, res, next){ //상품 반품
+router.patch('/hist/return/:purchId', function(req, res, next){ //상품 반품
     const purchId = req.params.purchId;
 
     PurchHist.findByIdAndUpdate(purchId, {$set: {return: true}})
@@ -70,14 +70,13 @@ router.patch('/return/:purchId', function(req, res, next){ //상품 반품
             res.status(200).json(result);
         })
         .catch(err => {
-            res.status(500).json({
-                error: err
-            })
+            console.log(err);
+            res.status(500).json({error: err})
         })
 
 });
 
-router.get('/', function(req, res, next){ //사용자 구매기록 조회
+router.get('/hist', function(req, res, next){ //사용자 구매기록 조회
     PurchHist.find()
         .exec()
         .limit(30)
@@ -92,7 +91,7 @@ router.get('/', function(req, res, next){ //사용자 구매기록 조회
         });
 });
 
-router.get('/:email', function(req, res, next){ //사용자 구매기록 조회
+router.get('/hist/:email', function(req, res, next){ //사용자 구매기록 조회
     const id = req.params.email;
     PurchHist.find({email: id})
         .exec()
@@ -107,7 +106,7 @@ router.get('/:email', function(req, res, next){ //사용자 구매기록 조회
         });
 });
 
-router.get('/:histId', function(req, res, next){
+router.get('/hist/:histId', function(req, res, next){
     const id = req.params.histId;
 
     PurchHist.findById(id)
@@ -116,7 +115,32 @@ router.get('/:histId', function(req, res, next){
             res.status.json(result);
         })
         .catch(err => {
+            console.log(err);
             res.status.json({error: err});
+        })
+})
+
+router.get('/sell', function(req, res, next){
+    PurchHist.find({ 
+        receive_date : { 
+          $lt: new Date(), 
+          $gte: new Date(new Date().setDate(new Date().getDate() - 5))}
+        })
+        .exec()
+        .then(docs => {
+            Product.find({_id: {$in:docs.map(ele => ele.product_id)}})
+                .exec()
+                .then(docs => {
+                    console.log(docs);
+                    var result = docs.map(ele => ele.total_sell).reduce(function(acc, val){
+                      return acc+val;
+                  }, 0);
+                  res.status(200).json(result);  
+                })
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({error: err})
         })
 })
 
