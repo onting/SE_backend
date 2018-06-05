@@ -6,9 +6,32 @@ const PurchHist = require('../models/purchHist');
 const Product = require('../models/product');
 const Cart = require('../models/cart');
 
-router.post('/hist/:email', function(req, res, next){ //카트에서 가져오기
-    const email = req.params.email;
+router.post('/hist', function(req, res, next){ //카트에서 가져오기
+    const purchHist = new PurchHist({
+        _id: new mongoose.Types.ObjectId,
+        email: req.body.email,
+        order_list: req.body.order_list,
+        payment_method: req.body.payment_method,
+        amount: req.body.amount,
+        address: req.body.address,
+        address_detail: req.body.address_detail,
+        purchase_date: req.body.purchase_date
+    })
+    purchHist.save()
+        .exec()
+        .then(result => {
+            Cart.remove({email: email})
+                .exec()
+            res.status(200).json(result);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({error: err});
+        })
+})
 
+router.post('/hist/move/:email', function(req, res, next){ //카트에서 가져오기
+    const email = req.params.email;
     Cart.findOneAndRemove({email: email})
         .exec()
         .then(result => {
@@ -79,7 +102,7 @@ router.patch('/hist/return/:purchId', function(req, res, next){ //상품 반품
 router.get('/hist', function(req, res, next){ //사용자 구매기록 조회
     PurchHist.find()
         .exec()
-        .limit(30)
+        .limit(20)
         .then(docs =>{
           res.status(200).json(docs);
         })
@@ -133,8 +156,7 @@ router.get('/sell', function(req, res, next){
                 .then(docs => {
                     console.log(docs);
                     var result = docs.map(ele => ele.total_sell).reduce(function(acc, val){
-                      return acc+val;
-                  }, 0);
+                      return acc+val;}, 0);
                   res.status(200).json(result);  
                 })
         })
