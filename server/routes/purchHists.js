@@ -10,8 +10,12 @@ router.post('/hist', function(req, res, next){ //카트에서 가져오기
     const purchHist = new PurchHist({
         _id: new mongoose.Types.ObjectId,
         email: req.body.email,
+        name: req.body.name,
         order_list: req.body.order_list,
         payment_method: req.body.payment_method,
+        name_recv: req.body.name_recv,
+        phone_recv: req.body.phone_recv,
+        post_code: req.body.post_code,
         amount: req.body.amount,
         address: req.body.address,
         address_detail: req.body.address_detail,
@@ -38,9 +42,13 @@ router.post('/hist/move/:email', function(req, res, next){ //카트에서 가져
             if(result) {
                 const purchHist = new PurchHist({
                     _id: new mongoose.Types.ObjectId,
+                    name: req.body.name,
                     email: result.email,
                     order_list: result.order_list,
                     payment_method: req.body.payment_method,
+                    name_recv: req.body.name_recv,
+                    phone_recv: req.body.phone_recv,
+                    post_code: req.body.post_code,
                     amount: req.body.amount,
                     address: req.body.address,
                     address_detail: req.body.address_detail,

@@ -3,12 +3,14 @@ const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const purchHistSchema = mongoose.Schema({
     _id: ObjectId,
+    name: {type: String, reqruied: true},
     email: {type: String, required: true, trim: true},
-    order_list: [{
-        product_id: ObjectId,
-        amount: {type: Number, default: 1, min: 1}
-    }],
+    order_list: Array,
+    phone: {type:String, required: true},
     payment_method: {type: String, required: true, trim: true},
+    name_recv: {type: String},
+    phone_recv: {type: String},
+    post_code: {type: String, required: true},
     address: {type: String, required: true},
     address_detail: {type: String, default: ''},
     purchase_date: {type: Date, required: true},
