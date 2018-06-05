@@ -34,8 +34,7 @@ router.delete('/:email', function(req, res, next){ //카트에서 삭제
 router.patch('/:email',function(req, res, next){ //주문 수정
     const id = req.params.email;
     Cart.update({email: id}, {$set: {order_list: req.body.order_list}, 
-        $setOnInsert: {_id: new mongoose.Types.ObjectId,
-        email: req.body.email}}, {upsert: true})
+        $setOnInsert: {_id: new mongoose.Types.ObjectId, email: req.body.email}}, {upsert: true})
         .exec()
         .then(result => {
             res.status(200).json(result);
