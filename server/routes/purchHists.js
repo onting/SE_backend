@@ -129,17 +129,17 @@ router.get('/hist/:email', function(req, res, next){ //사용자 구매기록 �
         });
 });
 
-router.get('/hist/:histId', function(req, res, next){
-    const id = req.params.histId;
-
-    PurchHist.findById(id)
+router.get('/date', function(req, res, next){
+    PurchHist.find()
+        .sort({$natural: 1})
+        .limit(10)
         .exec()
-        .then(result => {
-            res.status.json(result);
+        .then(docs => {
+            res.status(200).json(docs);
         })
         .catch(err => {
             console.log(err);
-            res.status.json({error: err});
+            res.status(500).json({error: err})
         })
 })
 
